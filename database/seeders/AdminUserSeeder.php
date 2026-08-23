@@ -22,7 +22,7 @@ class AdminUserSeeder extends Seeder
                 'address' => 'Tumbang Smart Kids RSIB',
                 'role' => 'admin',
                 'status' => 'active',
-                'password' => Hash::make('admin12345'),
+                'password' => Hash::make('admin123'),
             ]
         );
     }

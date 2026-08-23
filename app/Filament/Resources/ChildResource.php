@@ -149,6 +149,8 @@ class ChildResource extends Resource
     {
         return [
             RelationManagers\ChildActivitiesRelationManager::class,
+
+            RelationManagers\TreatmentCertificatesRelationManager::class,
         ];
     }
 

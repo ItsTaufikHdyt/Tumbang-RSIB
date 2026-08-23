@@ -74,4 +74,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->status === 'active';
     }
 
+    public function treatmentCertificates(): HasMany
+    {
+        return $this->hasMany(
+            TreatmentCertificate::class,
+            'created_by'
+        );
+    }
 }

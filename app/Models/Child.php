@@ -37,4 +37,9 @@ class Child extends Model
     {
         return $this->hasMany(EvaluationSession::class);
     }
+
+    public function treatmentCertificates(): HasMany
+{
+    return $this->hasMany(TreatmentCertificate::class);
+}
 }

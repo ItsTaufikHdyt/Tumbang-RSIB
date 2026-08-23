@@ -24,44 +24,17 @@ class EditChild extends EditRecord
         return [
             $this->makeInputEvaluationAction(),
 
-            Actions\Action::make('exportPdf')
-            ->label('Export PDF')
-            ->icon('heroicon-o-document-arrow-down')
-            ->color('primary')
-            ->action(function () {
-
-                $child = $this->record;
-
-                $child->load([
-                    'childActivities.evaluationDetails.session',
-                    'evaluationSessions.evaluator',
-                ]);
-
-                $pdf = Pdf::loadView(
-                    'pdf.child-report',
-                    [
-                        'child' => $child,
-                    ]
-                );
-
-                $pdf->setPaper(
-                    'a4',
-                    'portrait'
-                );
-
-                $fileName =
-                    'laporan-perkembangan-'
-                    . str($child->name)
-                        ->slug()
-                    . '.pdf';
-
-                return response()->streamDownload(
-                    function () use ($pdf) {
-                        echo $pdf->output();
-                    },
-                    $fileName
-                );
-            }),
+            Actions\Action::make('previewPdf')
+                ->label('Preview Laporan')
+                ->icon('heroicon-o-eye')
+                ->color('info')
+                ->url(
+                    fn() => route(
+                        'children.report.preview',
+                        $this->record
+                    )
+                )
+                ->openUrlInNewTab(),
 
             Actions\DeleteAction::make()
                 ->label('Hapus Pasien'),
@@ -250,7 +223,7 @@ class EditChild extends EditRecord
         return 1;
     }
 
-     public function getRedirectUrl(): string
+    public function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
