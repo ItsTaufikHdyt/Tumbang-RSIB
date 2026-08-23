@@ -1,1121 +1,1597 @@
 # Tumbang Smart Kids
 
-Aplikasi **Tumbang Smart Kids** merupakan sistem informasi berbasis web
+Aplikasi ****Tumbang Smart Kids**** merupakan sistem informasi berbasis web
+
 untuk membantu proses pencatatan, evaluasi, dan pemantauan perkembangan
-anak pada layanan **Klinik Tumbuh Kembang RSIB**.
+
+anak pada layanan ****Klinik Tumbuh Kembang RSIB****.
 
 Aplikasi ini mendigitalisasi proses evaluasi terapi anak yang sebelumnya
+
 dilakukan melalui formulir manual. Terapis dapat menentukan
+
 aktivitas/indikator khusus untuk setiap anak, melakukan penilaian pada
+
 setiap kunjungan, serta melihat perkembangan masing-masing aktivitas
+
 secara longitudinal.
 
-------------------------------------------------------------------------
+---
+## 📚 Daftar Isi
+
+- [Tentang Project](#-tentang-project)
+- [Tujuan](#-tujuan)
+- [Tech Stack](#️-tech-stack)
+- [Fitur Utama](#-fitur-utama)
+- [Sistem Evaluasi D/S](#-sistem-evaluasi-ds)
+- [Grafik Perkembangan](#-grafik-perkembangan)
+- [Laporan PDF](#-laporan-pdf)
+- [User Management](#-user-management)
+- [Struktur Database](#️-struktur-database)
+- [Instalasi](#-instalasi)
+- [Menjalankan dengan Docker](#-menjalankan-dengan-docker)
+- [Surat Keterangan Dalam Perawatan](#-surat-keterangan-dalam-perawatan)
+- [Pengembangan Selanjutnya](#️-pengembangan-selanjutnya)
+- [Status Project](#-status-project)
+
+---
 
 ## 📋 Tentang Project
 
 Pada proses terapi, setiap anak dapat memiliki daftar aktivitas atau
+
 indikator latihan yang berbeda.
 
 Contoh aktivitas:
 
 -   Identifikasi warna dasar
+
 -   Mengcopy garis
+
 -   Memegang pensil
+
 -   Menyusun puzzle
+
 -   Mengenal angka
+
 -   Aktivitas lainnya sesuai kebutuhan terapi
 
 Daftar aktivitas cukup dibuat ketika pasien mulai menjalani terapi. Pada
+
 kunjungan berikutnya, terapis tidak perlu mengetik ulang aktivitas
+
 tersebut.
 
 Terapis cukup memilih tanggal evaluasi dan memberikan skor untuk
+
 masing-masing aktivitas.
 
-------------------------------------------------------------------------
-
+---
 ## 🎯 Tujuan
 
 Project ini dikembangkan untuk:
 
 -   Mendigitalisasi pencatatan evaluasi tumbuh kembang anak.
+
 -   Mengurangi pencatatan manual menggunakan formulir kertas.
+
 -   Menyimpan riwayat evaluasi setiap pasien.
+
 -   Mempermudah terapis melakukan evaluasi rutin.
+
 -   Memantau perkembangan setiap aktivitas anak.
+
 -   Menampilkan perkembangan dalam bentuk grafik.
+
 -   Menyediakan laporan perkembangan anak dalam format PDF.
+
 -   Mengetahui terapis yang melakukan setiap evaluasi.
 
-------------------------------------------------------------------------
-
+---
 ## 🛠️ Tech Stack
 
 Project menggunakan:
 
-  Teknologi            Keterangan
-  -------------------- --------------------------
-  Laravel              Backend Framework
-  Filament v3          Administration Panel
-  Livewire             Reactive Component
-  Tailwind CSS         Styling
-  MySQL / PostgreSQL   Database
-  Chart.js             Visualisasi perkembangan
-  DomPDF               Generate laporan PDF
-  Vite                 Frontend build tool
+  | Teknologi | Keterangan |
+|---|---|
+| Laravel | Backend Framework |
+| Filament v3 | Administration Panel |
+| Livewire | Reactive Component |
+| Tailwind CSS | Styling |
+| MySQL / PostgreSQL | Database |
+| Chart.js | Visualisasi perkembangan |
+| DomPDF | Generate laporan PDF |
+| Vite | Frontend build tool |
 
-------------------------------------------------------------------------
-
-# ✨ Fitur Utama
-
-## 👶 Manajemen Pasien Anak
+---
+## ✨ Fitur Utama
+### 👶 Manajemen Pasien Anak
 
 Admin dan terapis dapat mengelola data pasien anak.
 
 Data pasien meliputi:
 
 -   Nama anak
+
 -   Tanggal lahir
+
 -   Jenis kelamin
+
 -   Nama ayah
+
 -   Nama ibu
+
 -   Alamat
 
 Setiap pasien memiliki aktivitas dan riwayat evaluasi masing-masing.
 
-------------------------------------------------------------------------
-
-## 📝 Aktivitas Per Anak
+---
+### 📝 Aktivitas Per Anak
 
 Setiap anak dapat mempunyai daftar aktivitas/indikator terapi yang
+
 berbeda.
 
 Contoh:
 
-``` text
+```text
+
 1. Identifikasi warna dasar
+
 2. Mengcopy garis
+
 3. Memegang pensil
+
 4. Menyusun puzzle
+
 5. Mengenal angka
+
 ```
 
 Aktivitas disimpan pada tabel:
 
-``` text
+```text
+
 child_activities
+
 ```
 
 dan terhubung dengan pasien melalui:
 
-``` text
+```text
+
 child_id
+
 ```
 
 Dengan konsep ini, terapis tidak perlu membuat ulang aktivitas pada
+
 setiap kunjungan.
 
-------------------------------------------------------------------------
-
-# 📊 Sistem Evaluasi D/S
-
+---
+## 📊 Sistem Evaluasi D/S
 Sistem menggunakan pola:
 
-``` text
+```text
+
 D = Date
+
 S = Score
+
 ```
 
-**D (Date)** merupakan tanggal evaluasi/konsultasi.
+****D (Date)**** merupakan tanggal evaluasi/konsultasi.
 
-**S (Score)** merupakan nilai kemampuan anak untuk setiap aktivitas.
+****S (Score)**** merupakan nilai kemampuan anak untuk setiap aktivitas.
 
 Skala penilaian:
 
     Skor Keterangan
+
   ------ ---------------------------------------
+
      `0` Full Prompted / Dibantu penuh
+
      `3` 70% Prompted / Dibantu sebagian besar
+
      `7` 30% Prompted / Dibantu sedikit
+
     `10` No Prompted / Mandiri
 
 Contoh perkembangan:
 
-``` text
+```text
+
 Aktivitas: Mengcopy garis
 
 01 Agustus 2026    → 3
+
 08 Agustus 2026    → 3
+
 15 Agustus 2026    → 7
+
 22 Agustus 2026    → 7
+
 29 Agustus 2026    → 10
+
 ```
 
 Sehingga perkembangan aktivitas tersebut adalah:
 
-``` text
+```text
+
 3 → 3 → 7 → 7 → 10
+
 ```
 
-------------------------------------------------------------------------
-
-# 📅 Evaluation Session
-
-Setiap kunjungan pasien menghasilkan sebuah **Evaluation Session**.
+---
+## 📅 Evaluation Session
+Setiap kunjungan pasien menghasilkan sebuah ****Evaluation Session****.
 
 Session menyimpan:
 
 -   Pasien
+
 -   Terapis/evaluator
+
 -   Tanggal evaluasi
+
 -   Total skor
+
 -   Catatan terapis
 
 Contoh:
 
-``` text
+```text
+
 Pasien          : Ahmad
+
 Tanggal         : 23 Agustus 2026
+
 Terapis         : Terapis A
+
 Catatan         : Perkembangan motorik mulai meningkat
+
 ```
 
-------------------------------------------------------------------------
-
-# 📋 Evaluation Detail
-
+---
+## 📋 Evaluation Detail
 Setiap aktivitas yang dinilai pada sebuah session disimpan sebagai
+
 `evaluation_details`.
 
 Contoh:
 
-``` text
+```text
+
 Evaluation Session
+
 │
+
 ├── Identifikasi warna → 7
+
 ├── Mengcopy garis     → 3
+
 ├── Memegang pensil    → 7
+
 ├── Menyusun puzzle    → 10
+
 └── Mengenal angka     → 7
+
 ```
 
 Dengan struktur ini, perkembangan setiap aktivitas dapat ditelusuri dari
+
 waktu ke waktu.
 
-------------------------------------------------------------------------
-
-# 📈 Grafik Perkembangan
-
-Aplikasi menyediakan grafik perkembangan **per aktivitas**.
+---
+## 📈 Grafik Perkembangan
+Aplikasi menyediakan grafik perkembangan ****per aktivitas****.
 
 Terapis terlebih dahulu memilih aktivitas:
 
-``` text
+```text
+
 Aktivitas
 
 [ 2. Mengcopy garis                 ▼ ]
+
 ```
 
 Kemudian sistem mengambil seluruh riwayat skor aktivitas tersebut.
 
 Contoh:
 
-``` text
+```text
+
 10 |                              ●
+
    |                            /
+
  7 |                   ●──────●
+
    |                 /
+
  3 |       ●────────●
+
    |
+
  0 +--------------------------------------
+
       01 Aug   08 Aug   15 Aug   22 Aug
+
 ```
 
 Pendekatan per aktivitas digunakan karena lebih representatif
+
 dibandingkan hanya melihat total skor seluruh aktivitas.
 
 Dengan demikian terapis dapat mengetahui apakah suatu kemampuan:
 
-``` text
+```text
+
 ↑ Meningkat
+
 → Stabil
+
 ↓ Menurun
+
 ```
 
-------------------------------------------------------------------------
-
-# 📄 Laporan PDF
-
+---
+## 📄 Laporan PDF
 Sistem menyediakan laporan perkembangan untuk masing-masing pasien.
 
 Pada halaman pasien tersedia fitur:
 
-``` text
+```text
+
 Preview Laporan
+
 ```
 
 Alurnya:
 
-``` text
+```text
+
 Pasien
+
    ↓
+
 Preview Laporan
+
    ↓
+
 Preview di Browser
+
    ↓
+
 Download PDF / Print
+
 ```
 
 Laporan berisi:
 
 -   Identitas pasien
+
 -   Keterangan skala scoring
+
 -   Daftar aktivitas
+
 -   Riwayat skor setiap aktivitas
+
 -   Riwayat konsultasi
+
 -   Terapis/evaluator
+
 -   Catatan evaluasi
 
 Contoh nama file:
 
-``` text
+```text
+
 laporan-perkembangan-ahmad.pdf
+
 ```
 
-------------------------------------------------------------------------
-
-# 👤 User Management
-
+---
+## 👤 User Management
 Sistem memiliki dua role utama:
 
-``` text
+```text
+
 admin
+
 terapis
+
 ```
 
 Data user:
 
 -   Nama
+
 -   Alamat
+
 -   Email
+
 -   Password
+
 -   Role
+
 -   Status
 
 Status user:
 
-``` text
+```text
+
 active
+
 inactive
+
 ```
 
 User dengan status `inactive` tidak diperbolehkan mengakses panel.
 
-------------------------------------------------------------------------
-
-## 🔐 Hak Akses
+---
+### 🔐 Hak Akses
 
   Fitur                       Admin   Terapis
+
   -------------------------- ------- ---------
+
   Login Panel                  ✅       ✅
+
   Kelola User                  ✅       ❌
+
   Tambah Pasien                ✅       ✅
+
   Edit Pasien                  ✅       ✅
+
   Kelola Aktivitas             ✅       ✅
+
   Input Evaluasi               ✅       ✅
+
   Melihat Grafik               ✅       ✅
+
   Melihat Riwayat Evaluasi     ✅       ✅
+
   Preview Laporan              ✅       ✅
+
   Export PDF                   ✅       ✅
+
   Hapus Pasien                 ✅       ❌
+
   Mengaktifkan User            ✅       ❌
 
-------------------------------------------------------------------------
-
-# 🗄️ Struktur Database
-
+---
+## 🗄️ Struktur Database
 Struktur utama database:
 
-``` text
+```text
+
 users
+
 │
+
 │ evaluator_id
+
 │
+
 └───────────────┐
+
                 │
+
 children        │
+
 │               │
+
 ├── child_activities
+
 │       │
+
 │       │
+
 │       └──────────────┐
+
 │                      │
+
 └── evaluation_sessions│
+
         │               │
+
         └── evaluation_details
+
 ```
 
-------------------------------------------------------------------------
-
+---
 ## `users`
 
 Menyimpan akun pengguna.
 
 Field utama:
 
-``` text
+```text
+
 id
+
 name
+
 address
+
 email
+
 password
+
 role
+
 status
+
 created_at
+
 updated_at
+
 ```
 
-------------------------------------------------------------------------
-
+---
 ## `children`
 
 Menyimpan data pasien anak.
 
-``` text
+```text
+
 id
+
 name
+
 date_of_birth
+
 gender
+
 father
+
 mother
+
 address
+
 created_at
+
 updated_at
+
 ```
 
-------------------------------------------------------------------------
-
+---
 ## `child_activities`
 
 Menyimpan aktivitas khusus masing-masing anak.
 
-``` text
+```text
+
 id
+
 child_id
+
 activity_no
+
 activity_name
+
 created_at
+
 updated_at
+
 ```
 
 Relasi:
 
-``` text
+```text
+
 children
+
     1
+
     │
+
     │
+
     N
+
 child_activities
+
 ```
 
-------------------------------------------------------------------------
-
+---
 ## `evaluation_sessions`
 
 Menyimpan informasi setiap kunjungan/evaluasi.
 
-``` text
+```text
+
 id
+
 child_id
+
 evaluator_id
+
 evaluation_date
+
 total_score
+
 notes
+
 created_at
+
 updated_at
+
 ```
 
 `evaluator_id` mengacu kepada user/terapis yang sedang login ketika
+
 evaluasi dilakukan.
 
-------------------------------------------------------------------------
-
+---
 ## `evaluation_details`
 
 Menyimpan skor setiap aktivitas.
 
-``` text
+```text
+
 id
+
 session_id
+
 activity_id
+
 score
+
 created_at
+
 updated_at
+
 ```
 
 Kombinasi:
 
-``` text
+```text
+
 session_id + activity_id
+
 ```
 
 harus unik agar satu aktivitas tidak mempunyai dua nilai dalam session
+
 yang sama.
 
-------------------------------------------------------------------------
+---
+## 🔗 Relasi Eloquent
+```text
 
-# 🔗 Relasi Eloquent
-
-``` text
 Child
+
 │
+
 ├── hasMany ChildActivity
+
 │
+
 └── hasMany EvaluationSession
 
 
 ChildActivity
+
 │
+
 ├── belongsTo Child
+
 │
+
 └── hasMany EvaluationDetail
 
 
 EvaluationSession
+
 │
+
 ├── belongsTo Child
+
 ├── belongsTo User (Evaluator)
+
 └── hasMany EvaluationDetail
 
 
 EvaluationDetail
+
 │
+
 ├── belongsTo EvaluationSession
+
 └── belongsTo ChildActivity
 
 
 User
+
 │
+
 └── hasMany EvaluationSession
+
 ```
 
-------------------------------------------------------------------------
-
-# 🚀 Instalasi
-
+---
+## 🚀 Instalasi
 Clone repository:
 
-``` bash
+```bash
+
 git clone <repository-url>
+
 ```
 
 Masuk ke directory project:
 
-``` bash
+```bash
+
 cd tumbang-smart-kids
+
 ```
 
 Install dependency PHP:
 
-``` bash
+```bash
+
 composer install
+
 ```
 
 Install dependency frontend:
 
-``` bash
+```bash
+
 npm install
+
 ```
 
 Salin `.env`:
 
-``` bash
+```bash
+
 cp .env.example .env
+
 ```
 
 Generate application key:
 
-``` bash
+```bash
+
 php artisan key:generate
+
 ```
 
-------------------------------------------------------------------------
-
-# 🗄️ Konfigurasi Database
-
+---
+## 🗄️ Konfigurasi Database
 Atur `.env`.
 
 Contoh MySQL:
 
-``` env
+```env
+
 DB_CONNECTION=mysql
+
 DB_HOST=127.0.0.1
+
 DB_PORT=3306
+
 DB_DATABASE=tumbang
+
 DB_USERNAME=root
+
 DB_PASSWORD=
+
 ```
 
 Kemudian:
 
-``` bash
+```bash
+
 php artisan migrate
+
 ```
 
-------------------------------------------------------------------------
-
-# 🌱 Database Seeder
-
+---
+## 🌱 Database Seeder
 Project dapat menyediakan akun development menggunakan seeder.
 
 Jalankan:
 
-``` bash
+```bash
+
 php artisan db:seed
+
 ```
 
 Atau sekaligus membuat ulang database:
 
-``` bash
+```bash
+
 php artisan migrate:fresh --seed
+
 ```
 
-> **PERINGATAN:** `migrate:fresh` akan menghapus seluruh tabel dan data
-> yang ada.
+*>* ****PERINGATAN:**** *`migrate:fresh` akan menghapus seluruh tabel dan data*
+
+*> yang ada.*
 
 Contoh akun development:
 
-``` text
+```text
+
 ADMIN
 
 Email    : admin@tumbang.test
+
 Password : admin12345
+
 ```
 
 dan:
 
-``` text
+```text
+
 TERAPIS
 
 Email    : terapis@tumbang.test
+
 Password : terapis12345
+
 ```
 
-> Akun dan password di atas hanya untuk development. Jangan menggunakan
-> password default tersebut pada environment production.
+*> Akun dan password di atas hanya untuk development. Jangan menggunakan*
 
-------------------------------------------------------------------------
+*> password default tersebut pada environment production.*
 
-# ▶️ Menjalankan Aplikasi
-
+---
+## ▶️ Menjalankan Aplikasi
 Backend:
 
-``` bash
+```bash
+
 php artisan serve
+
 ```
 
 Frontend development:
 
-``` bash
+```bash
+
 npm run dev
+
 ```
 
 Buka:
 
-``` text
+```text
+
 http://127.0.0.1:8000/admin
+
 ```
 
 Kemudian login menggunakan akun yang telah dibuat melalui database
+
 seeder.
 
-------------------------------------------------------------------------
-
-# 🐳 Menjalankan dengan Docker
-
+---
+## 🐳 Menjalankan dengan Docker
 Apabila project dijalankan menggunakan Docker Compose:
 
-``` bash
+```bash
+
 docker compose up -d
+
 ```
 
 Install dependency:
 
-``` bash
+```bash
+
 docker compose exec app composer install
+
 ```
 
 Generate key:
 
-``` bash
+```bash
+
 docker compose exec app php artisan key:generate
+
 ```
 
 Migration dan seeder:
 
-``` bash
+```bash
+
 docker compose exec app php artisan migrate --seed
+
 ```
 
 Membersihkan cache Laravel:
 
-``` bash
+```bash
+
 docker compose exec app php artisan optimize:clear
+
 ```
 
-------------------------------------------------------------------------
-
-# 🧹 Development Commands
-
+---
+## 🧹 Development Commands
 Membersihkan cache:
 
-``` bash
+```bash
+
 php artisan optimize:clear
+
 ```
 
 Menjalankan migration:
 
-``` bash
+```bash
+
 php artisan migrate
+
 ```
 
 Reset database development:
 
-``` bash
+```bash
+
 php artisan migrate:fresh --seed
+
 ```
 
 Menjalankan seeder:
 
-``` bash
+```bash
+
 php artisan db:seed
+
 ```
 
 Menjalankan queue jika nantinya digunakan:
 
-``` bash
+```bash
+
 php artisan queue:work
+
 ```
 
 Build frontend:
 
-``` bash
+```bash
+
 npm run build
+
 ```
 
-------------------------------------------------------------------------
+---
+## 📂 Struktur Project Utama
+```text
 
-# 📂 Struktur Project Utama
-
-``` text
 app/
+
 ├── Models/
+
 │   ├── User.php
+
 │   ├── Child.php
+
 │   ├── ChildActivity.php
+
 │   ├── EvaluationSession.php
+
 │   └── EvaluationDetail.php
+
 │
+
 └── Filament/
+
     └── Resources/
+
         ├── UserResource.php
+
         │
+
         └── ChildResource/
+
             ├── Pages/
+
             │   ├── ListChildren.php
+
             │   ├── CreateChild.php
+
             │   └── EditChild.php
+
             │
+
             ├── RelationManagers/
+
             │   └── ChildActivitiesRelationManager.php
+
             │
+
             └── Widgets/
+
                 └── ChildProgressChart.php
 
 database/
+
 ├── migrations/
+
 └── seeders/
 
 resources/
+
 └── views/
+
     └── pdf/
 
 routes/
+
 └── web.php
+
 ```
 
-------------------------------------------------------------------------
-
-# 🔄 Alur Sistem
-
+---
+## 🔄 Alur Sistem
 ### 1. Registrasi Pasien
 
-``` text
+```text
+
 Terapis/Admin
+
       ↓
+
 Tambah Pasien
+
       ↓
+
 Isi Biodata
+
       ↓
+
 Simpan
+
 ```
 
 ### 2. Menentukan Aktivitas
 
-``` text
+```text
+
 Pasien
+
    ↓
+
 Daftar Aktivitas
+
    ↓
+
 Tambah Aktivitas
+
    ↓
+
 1. Identifikasi warna
+
 2. Mengcopy garis
+
 3. Memegang pensil
+
 ```
 
 Aktivitas ini digunakan kembali pada evaluasi berikutnya.
 
 ### 3. Evaluasi
 
-``` text
+```text
+
 Pasien
+
    ↓
+
 Input Evaluasi
+
    ↓
+
 Tanggal Evaluasi
+
    ↓
+
 ────────────────────────────
+
 Identifikasi warna    0 3 7 10
+
 Mengcopy garis        0 3 7 10
+
 Memegang pensil       0 3 7 10
+
 ────────────────────────────
+
    ↓
+
 Simpan
+
 ```
 
 Sistem otomatis mencatat:
 
-``` text
+```text
+
 child_id
+
 evaluator_id
+
 evaluation_date
+
 score
+
 ```
 
 ### 4. Monitoring
 
-``` text
+```text
+
 Pasien
+
    ↓
+
 Pilih Aktivitas
+
    ↓
+
 Grafik Perkembangan
+
    ↓
+
 3 → 3 → 7 → 7 → 10
+
 ```
 
 ### 5. Laporan
 
-``` text
+```text
+
 Pasien
+
    ↓
+
 Preview Laporan
+
    ↓
+
 Preview Browser
+
    ↓
+
 Download PDF / Print
+
 ```
 
-------------------------------------------------------------------------
-
-# 🛡️ Catatan Keamanan
-
+---
+## 🛡️ Catatan Keamanan
 Beberapa prinsip yang digunakan:
 
 -   Password disimpan dalam bentuk hash.
+
 -   Email user harus unik.
+
 -   User inactive tidak diperbolehkan masuk panel.
+
 -   Evaluator diambil dari user yang sedang login.
+
 -   `activity_id` divalidasi terhadap pasien yang sedang dievaluasi.
+
 -   Penginputan session dan detail evaluasi dilakukan dalam database
+
     transaction.
+
 -   Foreign key digunakan untuk menjaga integritas data.
+
 -   Role digunakan untuk membatasi fitur administratif.
 
-------------------------------------------------------------------------
-
-# 📝 Scoring Reference
-
+---
+## 📝 Scoring Reference
      Score Prompting       Interpretasi
+
   -------- --------------- ------------------------
+
      **0** Full Prompted   Dibantu penuh
+
      **3** 70% Prompted    Dibantu sebagian besar
+
      **7** 30% Prompted    Dibantu sedikit
+
     **10** No Prompted     Mandiri
 
 Semakin tinggi nilai menunjukkan semakin sedikit bantuan yang diperlukan
+
 oleh anak dalam melakukan aktivitas tersebut.
 
-------------------------------------------------------------------------
+---
+## 📝 Surat Keterangan Dalam Perawatan
+Aplikasi menyediakan modul ****Surat Keterangan Dalam Perawatan**** yang
 
-# 📝 Surat Keterangan Dalam Perawatan
-
-Aplikasi menyediakan modul **Surat Keterangan Dalam Perawatan** yang
 terhubung langsung dengan data pasien anak. Fitur ini digunakan untuk
+
 membuat dan mengarsipkan surat keterangan bahwa seorang anak masih
-menjalani perawatan atau terapi di **TUMBANG Smart Kids RSIB**.
+
+menjalani perawatan atau terapi di ****TUMBANG Smart Kids RSIB****.
 
 Dengan modul ini, petugas tidak perlu mengetik ulang seluruh identitas
+
 pasien setiap kali membuat surat. Data dasar anak diambil dari data
+
 pasien yang sudah tersimpan pada sistem.
 
-## Data Surat
-
+### Data Surat
 Setiap surat menyimpan informasi seperti:
 
 -   Pasien/anak yang bersangkutan
+
 -   Nomor surat
+
 -   Tanggal surat
+
 -   Diagnosis dari dokter rehabilitasi
+
 -   Isi/keterangan surat
+
 -   User yang membuat surat
+
 -   Nama penanggung jawab
+
 -   Jabatan penanggung jawab
 
 Data surat disimpan pada tabel:
 
-``` text
+```text
+
 treatment_certificates
+
 ```
 
 Struktur utama data:
 
-``` text
+```text
+
 id
+
 child_id
+
 letter_number
+
 letter_date
+
 diagnosis
+
 statement
+
 created_by
+
 signer_name
+
 signer_title
+
 created_at
+
 updated_at
+
 ```
 
 `child_id` menghubungkan surat dengan data pasien pada tabel `children`,
+
 sedangkan `created_by` mencatat user yang membuat surat.
 
-## Data Pasien Otomatis
-
+### Data Pasien Otomatis
 Identitas anak pada surat diambil dari data pasien sehingga tidak perlu
+
 dimasukkan ulang.
 
 Data yang digunakan antara lain:
 
-``` text
+```text
+
 Nama
+
 Tempat Lahir
+
 Tanggal Lahir
+
 Alamat
+
 ```
 
-Untuk mendukung format **Tempat, Tanggal Lahir (TTL)** pada surat, data
+Untuk mendukung format ****Tempat, Tanggal Lahir (TTL)**** pada surat, data
+
 pasien dapat menggunakan field:
 
-``` text
+```text
+
 place_of_birth
+
 date_of_birth
+
 ```
 
 Contoh tampilan:
 
-``` text
+```text
+
 Nama                 : Ahmad
+
 TTL                  : Bontang, 20 Januari 2020
+
 Alamat               : Bontang
+
 Diagnosis dr. Rehab  : ASD
+
 ```
 
-## Historical Snapshot Surat
-
+### Historical Snapshot Surat
 Informasi seperti diagnosis, nama penanggung jawab, dan jabatan
+
 penanggung jawab disimpan pada record surat.
 
 Tujuannya agar surat yang sudah diterbitkan tetap mempertahankan
+
 informasi pada saat surat tersebut dibuat. Apabila penanggung jawab atau
+
 informasi surat berubah di kemudian hari, surat lama tidak ikut berubah.
 
-## Preview Surat
+### Preview Surat
+Setelah surat dibuat dan disimpan, user dapat membuka ****Preview Surat****
 
-Setelah surat dibuat dan disimpan, user dapat membuka **Preview Surat**
 terlebih dahulu sebelum mencetak atau mengunduh PDF.
 
 Alurnya:
 
-``` text
+```text
+
 Pasien
+
    ↓
+
 Surat Keterangan Dalam Perawatan
+
    ↓
+
 Buat Surat
+
    ↓
+
 Isi Data Surat
+
    ↓
+
 Simpan
+
    ↓
+
 Preview Surat
+
    ↓
+
 Download PDF / Print
+
 ```
 
 Preview dibuat menyerupai dokumen A4 agar user dapat memeriksa isi surat
+
 sebelum dicetak.
 
 Template preview berada pada:
 
-``` text
+```text
+
 resources/views/treatment-certificates/preview.blade.php
+
 ```
 
-## Export PDF Surat
-
-Surat dapat diunduh dalam format PDF menggunakan **DomPDF**.
+### Export PDF Surat
+Surat dapat diunduh dalam format PDF menggunakan ****DomPDF****.
 
 Template PDF berada pada:
 
-``` text
+```text
+
 resources/views/treatment-certificates/pdf.blade.php
+
 ```
 
 PDF surat dapat memuat:
 
 -   Kop/header layanan
+
 -   Logo RSIB
+
 -   Judul Surat Keterangan Dalam Perawatan
+
 -   Nomor surat
+
 -   Identitas anak
+
 -   Tempat dan tanggal lahir
+
 -   Alamat
+
 -   Diagnosis
+
 -   Isi keterangan
+
 -   Tanggal surat
+
 -   Nama penanggung jawab
+
 -   Jabatan penanggung jawab
 
 Untuk logo pada PDF, file dapat disimpan pada:
 
-``` text
+```text
+
 public/images/rsib.png
+
 ```
 
 Pada halaman preview browser, logo dapat dipanggil menggunakan
+
 `asset()`. Untuk hasil DomPDF, penggunaan local path melalui
+
 `public_path()` atau Base64 lebih stabil, khususnya ketika aplikasi
+
 berjalan menggunakan Docker.
 
-## Relasi Eloquent Surat
-
+### Relasi Eloquent Surat
 Relasi modul surat:
 
-``` text
+```text
+
 Child
+
 │
+
 └── hasMany TreatmentCertificate
 
 TreatmentCertificate
+
 │
+
 ├── belongsTo Child
+
 └── belongsTo User (Creator)
 
 User
+
 │
+
 └── hasMany TreatmentCertificate
+
 ```
 
 Dengan relasi tersebut, satu anak dapat memiliki lebih dari satu surat
+
 pada tanggal yang berbeda dan seluruh riwayat surat tetap tersimpan.
 
-## Alur Penggunaan Surat
+### Alur Penggunaan Surat
+```text
 
-``` text
 Terapis / Admin
+
       ↓
+
 Buka Data Pasien
+
       ↓
+
 Surat Keterangan Dalam Perawatan
+
       ↓
+
 Buat Surat
+
       ↓
+
 Isi Nomor Surat, Tanggal, Diagnosis,
+
 Keterangan dan Penanggung Jawab
+
       ↓
+
 Simpan
+
       ↓
+
 Preview
+
       ↓
+
 Download PDF / Print
+
 ```
 
 Pemisahan setiap surat sebagai record tersendiri memungkinkan sistem
+
 menyimpan histori dokumen administratif masing-masing pasien.
 
-------------------------------------------------------------------------
-
-# 🗺️ Pengembangan Selanjutnya
-
+---
+## 🗺️ Pengembangan Selanjutnya
 Beberapa fitur yang dapat dikembangkan:
 
--   Surat Keterangan Dalam Perawatan
--   Preview dan export surat PDF
+
+
 -   Nomor surat otomatis
+
 -   Tanda tangan digital
+
 -   Dashboard statistik pasien
+
 -   Filter laporan berdasarkan periode
+
 -   Perbandingan perkembangan beberapa aktivitas
+
 -   Riwayat perubahan aktivitas
+
 -   Audit log aktivitas user
+
 -   Backup database
+
 -   Export Excel
+
 -   Laporan perkembangan berdasarkan periode
+
 -   Notifikasi jadwal evaluasi
+
 -   Manajemen jadwal terapi
 
-------------------------------------------------------------------------
-
-# 📌 Status Project
-
+---
+## 📌 Status Project
 Saat ini modul utama yang telah dirancang meliputi:
 
-``` text
+```text
+
 ✓ User Management
+
 ✓ Role Admin / Terapis
+
 ✓ Status User
+
 ✓ Manajemen Pasien
+
 ✓ Aktivitas Per Anak
+
 ✓ Evaluation Session
+
 ✓ Scoring Per Aktivitas
+
 ✓ Riwayat Evaluasi
+
 ✓ Grafik Perkembangan Per Aktivitas
+
 ✓ Preview Laporan
+
 ✓ Export PDF Per Anak
 
-○ Surat Keterangan Dalam Perawatan
+✓ Surat Keterangan Dalam Perawatan
+✓ Preview Surat Keterangan
+✓ Export PDF Surat Keterangan
+
 ○ Dashboard Statistik
+
 ○ Audit Log
+
 ○ Export Excel
+
 ```
 
-------------------------------------------------------------------------
-
+---
 ## License
 
 Project ini dikembangkan untuk kebutuhan sistem informasi **Tumbang
+
 Smart Kids / Klinik Tumbuh Kembang RSIB**.
 
 Penggunaan, distribusi, dan pengembangan lebih lanjut mengikuti
+
 kebijakan internal organisasi.
