@@ -1,0 +1,143 @@
+services:
+  app:
+    build:
+      context: .docker/php
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.4}
+        NODE_MAJOR: ${NODE_MAJOR:-22}
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+    ports:
+      - "5173:5173" # Vite HMR dev
+      - "8002:8000" # php artisan serve (opsional)
+    volumes:
+      - .:/var/www:cached
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm -t || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fwdocker
+
+  nginx:
+    image: nginx:1.27
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost}
+    volumes:
+      - .:/var/www
+      - .docker/nginx/default.conf:/etc/nginx/templates/default.conf.template:ro
+      - .docker/nginx/fastcgi.conf:/etc/nginx/fastcgi.conf:ro
+    networks:
+      - fwdocker
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "127.0.0.1:3306:3306" # hanya localhost VPS
+    env_file:
+      - db.env
+    volumes:
+      - .docker/db/data:/var/lib/mysql
+      - .docker/logs:/var/log/mysql
+      - .docker/db/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - .docker/db/sql:/docker-entrypoint-initdb.d
+    networks:
+      - fwdocker
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  adminer:
+    image: adminer:4.8.1
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080" # akses lokal; di VPS batasi firewall/IP
+    networks:
+      - fwdocker
+
+networks:
+  fwdocker:
+    driver: bridge
+# caddy:
+#   image: caddy:2.8
+#   container_name: wrongshock_caddy
+#   restart: unless-stopped
+#   ports:
+#     - "80:80"
+#     - "443:443"
+#   environment:
+#     # ganti email kamu untuk notifikasi/Let's Encrypt
+#     ACME_EMAIL: admin@wrongshock.biz.id
+#     # domain utama (bisa isi lewat .env juga)
+#     PRIMARY_DOMAIN: wrongshock.biz.id
+#   volumes:
+#     - ./.docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+#     - caddy_data:/data
+#     - caddy_config:/config
+#   depends_on:
+#     - nginx
+#   networks:
+#     - wrongshock
+
+# volumes:
+#   caddy_data:
+#   caddy_config:
+
+# ####################################################################################################
+# # DATABASE (MariaDB)
+# ####################################################################################################
+# db:
+#     container_name: laravel_mariadb
+#     image: mariadb:10.11
+#     ports:
+#         - 3306:3306
+#     volumes:
+#         - .docker/db/data:/var/lib/mysql
+#         - .docker/logs:/var/log/mysql
+#         - .docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+#         - .docker/db/sql:/docker-entrypoint-initdb.d
+#     environment:
+#         MYSQL_ROOT_PASSWORD: root
+#         MYSQL_DATABASE: laravel_db_name
+#         MYSQL_USER: laravel_db_user
+#         MYSQL_PASSWORD: laravel_db_pass
+
+####################################################################################################
+# Mailpit
+####################################################################################################
+# mail:
+#     container_name: fw_mailpit
+#     image: axllent/mailpit:latest
+#     ports:
+#     - 8025:8025
+#     - 1025:1025
+
+####################################################################################################
+# phpMyAdmin
+####################################################################################################
+# phpmyadmin:
+#     image: phpmyadmin/phpmyadmin
+#     container_name: fw_phpmyadmin
+#     ports:
+#         - 8080:80
+#     links:
+#         - db
+#     environment:
+#         PMA_HOST: db
+#         PMA_PORT: 3306
+#         PMA_ARBITRARY: 1
+#     volumes:
+#         - .docker/phpmyadmin/sessions:/sessions
