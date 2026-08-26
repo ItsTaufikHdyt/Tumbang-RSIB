@@ -6,12 +6,12 @@ use App\Models\Child;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('home');
+})->name('home');
 
 Route::middleware('auth')->group(function () {
 
-     Route::get('/children/{child}/report/preview', function (Child $child) {
+    Route::get('/children/{child}/report/preview', function (Child $child) {
         $child->load([
             'childActivities.evaluationDetails.session',
             'evaluationSessions.evaluator',
