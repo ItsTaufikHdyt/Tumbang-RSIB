@@ -18,7 +18,7 @@ return new class extends Migration
         ->constrained('children')
         ->cascadeOnDelete();
 
-    $table->string('letter_number')->nullable();
+    // $table->string('letter_number')->nullable();
 
     $table->date('letter_date');
 

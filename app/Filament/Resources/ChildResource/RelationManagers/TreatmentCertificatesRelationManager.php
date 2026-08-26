@@ -32,14 +32,14 @@ class TreatmentCertificatesRelationManager extends RelationManager
                     'Data Surat'
                 )
                     ->schema([
-                        Forms\Components\TextInput::make(
-                            'letter_number'
-                        )
-                            ->label('Nomor Surat')
-                            ->placeholder(
-                                'Contoh: 001/SK/TSK/VIII/2026'
-                            )
-                            ->maxLength(255),
+                        // Forms\Components\TextInput::make(
+                        //     'letter_number'
+                        // )
+                        //     ->label('Nomor Surat')
+                        //     ->placeholder(
+                        //         'Contoh: 001/SK/TSK/VIII/2026'
+                        //     )
+                        //     ->maxLength(255),
 
                         Forms\Components\DatePicker::make(
                             'letter_date'
@@ -72,20 +72,14 @@ class TreatmentCertificatesRelationManager extends RelationManager
                             'signer_name'
                         )
                             ->label('Nama Penanggung Jawab')
-                            ->default(
-                                'Muhamad Sawali, S.Ft, Ftr, '
-                                . 'NDT, SIPT, M.K.M'
-                            )
                             ->required(),
 
                         Forms\Components\TextInput::make(
                             'signer_title'
                         )
                             ->label('Jabatan Penanggung Jawab')
-                            ->default(
-                                'Penanggung Jawab Layanan '
-                                . 'TUMBANG Smart Kids RSIB'
-                            )
+                            ->placeholder('Penanggung Jawab Layanan '
+                                . 'TUMBANG Smart Kids RSIB')
                             ->required(),
                     ])
                     ->columns(2),
@@ -97,12 +91,12 @@ class TreatmentCertificatesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('letter_number')
             ->columns([
-                Tables\Columns\TextColumn::make(
-                    'letter_number'
-                )
-                    ->label('Nomor Surat')
-                    ->placeholder('-')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make(
+                //     'letter_number'
+                // )
+                //     ->label('Nomor Surat')
+                //     ->placeholder('-')
+                //     ->searchable(),
 
                 Tables\Columns\TextColumn::make(
                     'letter_date'

@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class TreatmentCertificate extends Model
 {
     protected $fillable = [
+        // 'letter_number',
         'child_id',
-        'letter_number',
         'letter_date',
         'diagnosis',
         'statement',
